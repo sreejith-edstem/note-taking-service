@@ -11,8 +11,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-
-    public String handleRunTimeException(RuntimeException ex){
+    public String handleRunTimeException(RuntimeException ex) {
         return "Sorry, " + ex.getMessage();
     }
 }

@@ -1,5 +1,16 @@
 package notetakingapplication.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -9,31 +20,21 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 public class NoteTakingServiceTest {
     private NoteTakingRepository noteTakingRepository;
     private ModelMapper modelMapper;
-    private NoteTakingService noteTakingService = new NoteTakingService(null,null);
+    private NoteTakingService noteTakingService = new NoteTakingService(null, null);
+
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.openMocks(this);
         noteTakingRepository = Mockito.mock(NoteTakingRepository.class);
         modelMapper = Mockito.mock(ModelMapper.class);
-        noteTakingService = new NoteTakingService(noteTakingRepository,modelMapper);
+        noteTakingService = new NoteTakingService(noteTakingRepository, modelMapper);
     }
+
     @Test
-    public void testAddNotes(){
+    public void testAddNotes() {
         NoteTakingRequest request = new NoteTakingRequest();
         request.setTitle("Test Title");
         request.setContent("Test Content");
@@ -45,18 +46,20 @@ public class NoteTakingServiceTest {
         verify(noteTakingRepository, times(1)).save(note);
         assertEquals(note.getId(), resultId);
     }
+
     @Test
-    public void testGetAllNotes(){
+    public void testGetAllNotes() {
         Note note = new Note();
         Note note1 = new Note();
         List<Note> notes = Arrays.asList(note, note1);
         when(noteTakingRepository.findAll()).thenReturn(notes);
         List<Note> result = noteTakingService.getAllNotes();
-        verify(noteTakingRepository,times(1)).findAll();
-        assertEquals(notes.size(),result.size());
+        verify(noteTakingRepository, times(1)).findAll();
+        assertEquals(notes.size(), result.size());
         assertEquals(notes.get(0).getTitle(), result.get(0).getTitle());
         assertEquals(notes.get(1).getTitle(), result.get(1).getTitle());
     }
+
     @Test
     public void testGetNoteById() {
         long id = 1L;
@@ -83,11 +86,12 @@ public class NoteTakingServiceTest {
         request.setTitle("Updated Title");
         request.setContent("Updated Content");
 
-        Note note = Note.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Note note =
+                Note.builder()
+                        .title(request.getTitle())
+                        .content(request.getContent())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
 
         when(noteTakingRepository.findById(id)).thenReturn(Optional.of(note));
         when(noteTakingRepository.save(any(Note.class))).thenReturn(note);
@@ -98,6 +102,7 @@ public class NoteTakingServiceTest {
         verify(noteTakingRepository, times(1)).save(any(Note.class));
         assertEquals(note.getId(), resultId);
     }
+
     @Test
     public void testUpdateNoteById_NotFound() {
         long id = 1L;
@@ -109,8 +114,9 @@ public class NoteTakingServiceTest {
         assertThrows(RuntimeException.class, () -> noteTakingService.updateNoteById(id, request));
         verify(noteTakingRepository, times(1)).findById(id);
     }
+
     @Test
-    public void testDeleteNoteById(){
+    public void testDeleteNoteById() {
         long id = 1L;
 
         when(noteTakingRepository.existsById(id)).thenReturn(true);
@@ -119,6 +125,7 @@ public class NoteTakingServiceTest {
         verify(noteTakingRepository, times(1)).existsById(id);
         verify(noteTakingRepository, times(1)).deleteById(id);
     }
+
     @Test
     public void testDeleteNoteById_NotFound() {
         long id = 1L;
