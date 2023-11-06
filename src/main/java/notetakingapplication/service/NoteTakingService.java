@@ -1,6 +1,5 @@
 package notetakingapplication.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
@@ -9,9 +8,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +24,8 @@ public class NoteTakingService {
         return note.getId();
     }
 
-    public List<Note> getAllNotes() {
-        Iterable<Note> movies = this.noteTakingRepository.findAll();
-        List<Note> moviesList = new ArrayList<>();
-        movies.forEach(moviesList::add);
-        return moviesList;
+    public List<Note> getAllNotesSortedByUpdatedDate() {
+        return noteTakingRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     public Note getNoteById(long id) {
@@ -63,5 +60,54 @@ public class NoteTakingService {
             throw new RuntimeException("Note not found");
         }
         noteTakingRepository.deleteById(id);
+    }
+
+    public boolean addNoteToFavorites(Long noteId) {
+        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
+
+        if (optionalNote.isPresent()) {
+            Note note = optionalNote.get();
+            Note updatedNote = Note.builder()
+                    .id(note.getId())
+                    .title(note.getTitle())
+                    .content(note.getContent())
+                    .createdAt(note.getCreatedAt())
+                    .updatedAt(note.getUpdatedAt())
+                    .favourite(true)
+                    .build();
+            noteTakingRepository.save(updatedNote);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean removeNoteFromFavorites(Long noteId) {
+        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
+
+        if (optionalNote.isPresent()) {
+            Note note = optionalNote.get();
+            Note updatedNote = Note.builder()
+                    .id(note.getId())
+                    .title(note.getTitle())
+                    .content(note.getContent())
+                    .createdAt(note.getCreatedAt())
+                    .updatedAt(note.getUpdatedAt())
+                    .favourite(false)
+                    .build();
+            noteTakingRepository.save(updatedNote);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public List<Note> getAllFavoriteNotes() {
+        List<Note> allNotes = this.noteTakingRepository.findAll();
+        List<Note> favoriteNotes = allNotes.stream()
+                .filter(Note::isFavourite)
+                .sorted(Comparator.comparing(Note::getUpdatedAt).reversed())
+                .collect(Collectors.toList());
+        return favoriteNotes;
     }
 }
