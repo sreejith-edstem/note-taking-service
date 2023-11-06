@@ -1,9 +1,6 @@
 package notetakingapplication.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
@@ -11,13 +8,17 @@ import notetakingapplication.repository.NoteTakingRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class NoteTakingService {
     private final NoteTakingRepository noteTakingRepository;
     private final ModelMapper modelMapper;
 
-    public long addNotes(NoteTakingRequest request) {
+    public long addNotes(@Valid NoteTakingRequest request) {
         Note note = noteTakingRepository.save(modelMapper.map(request, Note.class));
         return note.getId();
     }
@@ -37,19 +38,21 @@ public class NoteTakingService {
         return note.get();
     }
 
-    public Long updateNoteById(long id, NoteTakingRequest request) {
+    public Long updateNoteById(long id, @Valid NoteTakingRequest request) {
         Optional<Note> note = this.noteTakingRepository.findById(id);
         if (!note.isPresent()) {
             throw new RuntimeException("Note not found");
+        } else {
+            Note updatedNote = note.get();
+            updatedNote = Note.builder()
+                    .id(updatedNote.getId())
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .build();
+            noteTakingRepository.save(updatedNote);
+            return updatedNote.getId();
         }
-        Note notes =
-                Note.builder()
-                        .title(request.getTitle())
-                        .content(request.getContent())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
-        noteTakingRepository.save(notes);
-        return notes.getId();
+
     }
 
     public void deleteNoteById(long id) {

@@ -1,9 +1,11 @@
 package notetakingapplication.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +25,7 @@ public class NoteTakingController {
     private final NoteTakingService noteTakingService;
 
     @PostMapping
-    public @ResponseBody Long addNotes(@RequestBody NoteTakingRequest request) {
+    public @ResponseBody Long addNotes(@Valid @RequestBody NoteTakingRequest request) {
         return this.noteTakingService.addNotes(request);
     }
 
