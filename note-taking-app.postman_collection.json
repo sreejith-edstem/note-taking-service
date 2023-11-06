@@ -44,6 +44,23 @@
 				"url": "http://localhost:8080/notes"
 			},
 			"response": []
+		},
+		{
+			"name": "Update note",
+			"request": {
+				"method": "PUT",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Delete note",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/notes/11"
+			},
+			"response": []
 		}
 	]
 }
