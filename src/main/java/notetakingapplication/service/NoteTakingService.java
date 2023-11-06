@@ -8,6 +8,7 @@ import notetakingapplication.repository.NoteTakingRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +49,7 @@ public class NoteTakingService {
                     .id(updatedNote.getId())
                     .title(request.getTitle())
                     .content(request.getContent())
+                    .updatedAt(LocalDateTime.now())
                     .build();
             noteTakingRepository.save(updatedNote);
             return updatedNote.getId();
