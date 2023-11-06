@@ -1,0 +1,49 @@
+{
+	"info": {
+		"_postman_id": "65e00e4a-fc12-4b8b-afd8-c50388e2f7da",
+		"name": "note-taking-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "28650719"
+	},
+	"item": [
+		{
+			"name": "Getting notes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\" : \"Pollution\",\r\n    \"content\" : \"Our earth is a pollution\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/notes/2"
+			},
+			"response": []
+		},
+		{
+			"name": "Adding notes",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\" : \"Pollution\",\r\n    \"content\" : \"Our earth is a pollution\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/notes"
+			},
+			"response": []
+		}
+	]
+}
