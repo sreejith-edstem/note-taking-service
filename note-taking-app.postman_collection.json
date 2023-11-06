@@ -61,6 +61,33 @@
 				"url": "http://localhost:8080/notes/11"
 			},
 			"response": []
+		},
+		{
+			"name": "Added to favorites",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/notes/1/favorite"
+			},
+			"response": []
+		},
+		{
+			"name": "Remove from favorite",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/notes/1/removeFavorite"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all favorites",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/notes/favorites"
+			},
+			"response": []
 		}
 	]
 }
