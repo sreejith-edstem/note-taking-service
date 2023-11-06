@@ -47,6 +47,7 @@ public class NoteTakingService {
             Note updatedNote = note.get();
             updatedNote = Note.builder()
                     .id(updatedNote.getId())
+                    .createdAt(updatedNote.getCreatedAt())
                     .title(request.getTitle())
                     .content(request.getContent())
                     .updatedAt(LocalDateTime.now())
