@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +40,7 @@ public class NoteTakingController {
 
     @PutMapping("/{id}")
     public @ResponseBody Long updateNoteById(
-            @PathVariable long id, @RequestBody NoteTakingRequest request) {
+            @PathVariable long id, @Valid @RequestBody NoteTakingRequest request) {
         return noteTakingService.updateNoteById(id, request);
     }
 

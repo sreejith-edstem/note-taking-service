@@ -19,7 +19,7 @@ public class NoteTakingService {
     private final NoteTakingRepository noteTakingRepository;
     private final ModelMapper modelMapper;
 
-    public long addNotes(@Valid NoteTakingRequest request) {
+    public long addNotes(NoteTakingRequest request) {
         Note note = noteTakingRepository.save(modelMapper.map(request, Note.class));
         return note.getId();
     }
@@ -39,7 +39,7 @@ public class NoteTakingService {
         return note.get();
     }
 
-    public Long updateNoteById(long id, @Valid NoteTakingRequest request) {
+    public Long updateNoteById(long id, NoteTakingRequest request) {
         Optional<Note> note = this.noteTakingRepository.findById(id);
         if (!note.isPresent()) {
             throw new RuntimeException("Note not found");
