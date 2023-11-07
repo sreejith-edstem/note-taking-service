@@ -73,7 +73,7 @@ public class NoteTakingService {
                     .content(note.getContent())
                     .createdAt(note.getCreatedAt())
                     .updatedAt(note.getUpdatedAt())
-                    .favourite(true)
+                    .isFavourite(true)
                     .build();
             noteTakingRepository.save(updatedNote);
             return true;
@@ -93,7 +93,7 @@ public class NoteTakingService {
                     .content(note.getContent())
                     .createdAt(note.getCreatedAt())
                     .updatedAt(note.getUpdatedAt())
-                    .favourite(false)
+                    .isFavourite(false)
                     .build();
             noteTakingRepository.save(updatedNote);
             return true;

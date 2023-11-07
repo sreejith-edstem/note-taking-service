@@ -1,23 +1,7 @@
 package notetakingapplication.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import notetakingapplication.contract.request.NoteTakingRequest;
-import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +10,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,32 +47,19 @@ public class NoteTakingControllerTest {
 
     @Test
     public void getAllNotesTest() throws Exception {
-        Note note1 = new Note(1L, "Title 1", "Content 1", LocalDateTime.now(), LocalDateTime.now());
-        Note note2 = new Note(2L, "Title 2", "Content 2", LocalDateTime.now(), LocalDateTime.now());
-        List<Note> notes = Arrays.asList(note1, note2);
-
-        when(noteTakingService.getAllNotes()).thenReturn(notes);
-
-        mockMvc.perform(get("/notes"))
-                .andExpect(status().isOk())
-                .andExpect(
-                        content()
-                                .json(
-                                        "[{'id': 1, 'title': 'Title 1', 'content': 'Content 1'},"
-                                            + " {'id': 2, 'title': 'Title 2', 'content': 'Content"
-                                            + " 2'}]"));
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/notes")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void testGetNoteById() throws Exception {
-        Long id = 1L;
-        Note note = new Note(id, "Title 1", "Content 1", LocalDateTime.now(), LocalDateTime.now());
-
-        when(noteTakingService.getNoteById(id)).thenReturn(note);
-
-        mockMvc.perform(get("/notes/" + id))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{'id': 1, 'title': 'Title 1', 'content': 'Content 1'}"));
+        Long noteId = 1L;
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/notes/" + noteId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test

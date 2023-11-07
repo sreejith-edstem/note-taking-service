@@ -24,5 +24,5 @@ public class Note {
     private String content;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
-    private boolean favourite;
+    private boolean isFavourite;
 }

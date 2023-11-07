@@ -50,7 +50,7 @@ public class NoteTakingController {
         noteTakingService.deleteNoteById(id);
     }
 
-    @PutMapping("/{noteId}/favorite")
+    @PutMapping("/favorite/{noteId}")
     public ResponseEntity<?> addNoteToFavorites(@PathVariable Long noteId) {
         boolean isAdded = noteTakingService.addNoteToFavorites(noteId);
         if (isAdded) {
@@ -60,7 +60,7 @@ public class NoteTakingController {
         }
     }
 
-    @PutMapping("/{noteId}/unfavorite")
+    @PutMapping("/unfavorite/{noteId}")
     public ResponseEntity<?> removeNoteFromFavorites(@PathVariable Long noteId) {
         boolean isRemoved = noteTakingService.removeNoteFromFavorites(noteId);
         if (isRemoved) {

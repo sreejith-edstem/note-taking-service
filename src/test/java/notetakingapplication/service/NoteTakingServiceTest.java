@@ -49,15 +49,15 @@ public class NoteTakingServiceTest {
 
     @Test
     public void testGetAllNotes() {
-        Note note = new Note();
         Note note1 = new Note();
-        List<Note> notes = Arrays.asList(note, note1);
-        when(noteTakingRepository.findAll()).thenReturn(notes);
-        List<Note> result = noteTakingService.getAllNotes();
-        verify(noteTakingRepository, times(1)).findAll();
-        assertEquals(notes.size(), result.size());
-        assertEquals(notes.get(0).getTitle(), result.get(0).getTitle());
-        assertEquals(notes.get(1).getTitle(), result.get(1).getTitle());
+        Note note2 = new Note();
+        List<Note> expectedNotes = Arrays.asList(note1, note2);
+
+        when(noteTakingRepository.findAllByOrderByUpdatedAtDesc()).thenReturn(expectedNotes);
+
+        List<Note> actualNotes = noteTakingService.getAllNotesSortedByUpdatedDate();
+
+        assertEquals(expectedNotes, actualNotes);
     }
 
     @Test
@@ -134,5 +134,25 @@ public class NoteTakingServiceTest {
 
         assertThrows(RuntimeException.class, () -> noteTakingService.deleteNoteById(id));
         verify(noteTakingRepository, times(1)).existsById(id);
+    }
+    @Test
+    public void testAddNoteToFavorites() {
+        Note note = new Note();
+        when(noteTakingRepository.findById(any(Long.class))).thenReturn(Optional.of(note));
+
+        boolean isAdded = noteTakingService.addNoteToFavorites(1L);
+
+        verify(noteTakingRepository, times(1)).save(any(Note.class));
+        assert(isAdded);
+    }
+    @Test
+    public void testRemoveNoteFromFavorites() {
+        Note note = new Note();
+        when(noteTakingRepository.findById(any(Long.class))).thenReturn(Optional.of(note));
+
+        boolean isRemoved = noteTakingService.removeNoteFromFavorites(1L);
+
+        verify(noteTakingRepository, times(1)).save(any(Note.class));
+        assert(isRemoved);
     }
 }
