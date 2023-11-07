@@ -45,6 +45,7 @@ public class NoteTakingService {
             updatedNote = Note.builder()
                     .id(updatedNote.getId())
                     .createdAt(updatedNote.getCreatedAt())
+                    .isFavourite(updatedNote.isFavourite())
                     .title(request.getTitle())
                     .content(request.getContent())
                     .updatedAt(LocalDateTime.now())
@@ -68,8 +69,15 @@ public class NoteTakingService {
 
         if (optionalNote.isPresent()) {
             Note note = optionalNote.get();
-            note.setFavourite(!note.isFavourite());
-            noteTakingRepository.save(note);
+            Note updatedNote = Note.builder()
+                    .id(note.getId())
+                    .title(note.getTitle())
+                    .content(note.getContent())
+                    .createdAt(note.getCreatedAt())
+                    .updatedAt(note.getUpdatedAt())
+                    .isFavourite(!note.isFavourite())
+                    .build();
+            noteTakingRepository.save(updatedNote);
             return true;
         } else {
             return false;

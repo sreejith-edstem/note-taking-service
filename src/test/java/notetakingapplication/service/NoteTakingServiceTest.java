@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -136,26 +137,14 @@ public class NoteTakingServiceTest {
         assertThrows(RuntimeException.class, () -> noteTakingService.deleteNoteById(id));
         verify(noteTakingRepository, times(1)).existsById(id);
     }
+
     @Test
-    public void testAddNoteToFavorites() {
-        Note note = new Note();
-        when(noteTakingRepository.findById(any(Long.class))).thenReturn(Optional.of(note));
-
-        boolean isAdded = noteTakingService.addNoteToFavorites(1L);
-
-        verify(noteTakingRepository, times(1)).save(any(Note.class));
-        assert(isAdded);
+    public void testToggleFavorite() {
+        Long noteId = 1L;
+        boolean isToggled = noteTakingService.toggleFavorite(noteId);
+        assertTrue(isToggled, "Expected toggleFavorite to return false");
     }
-    @Test
-    public void testRemoveNoteFromFavorites() {
-        Note note = new Note();
-        when(noteTakingRepository.findById(any(Long.class))).thenReturn(Optional.of(note));
 
-        boolean isRemoved = noteTakingService.removeNoteFromFavorites(1L);
-
-        verify(noteTakingRepository, times(1)).save(any(Note.class));
-        assert(isRemoved);
-    }
     @Test
     public void testGetAllFavoriteNotes() {
         List<Note> favoriteNotes = noteTakingService.getAllFavoriteNotes();
