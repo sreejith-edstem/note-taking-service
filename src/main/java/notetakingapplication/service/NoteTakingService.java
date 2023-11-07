@@ -62,45 +62,20 @@ public class NoteTakingService {
         noteTakingRepository.deleteById(id);
     }
 
-    public boolean addNoteToFavorites(Long noteId) {
+
+    public boolean toggleFavorite(Long noteId) {
         Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
 
         if (optionalNote.isPresent()) {
             Note note = optionalNote.get();
-            Note updatedNote = Note.builder()
-                    .id(note.getId())
-                    .title(note.getTitle())
-                    .content(note.getContent())
-                    .createdAt(note.getCreatedAt())
-                    .updatedAt(note.getUpdatedAt())
-                    .isFavourite(true)
-                    .build();
-            noteTakingRepository.save(updatedNote);
+            note.setFavourite(!note.isFavourite());
+            noteTakingRepository.save(note);
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean removeNoteFromFavorites(Long noteId) {
-        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
-
-        if (optionalNote.isPresent()) {
-            Note note = optionalNote.get();
-            Note updatedNote = Note.builder()
-                    .id(note.getId())
-                    .title(note.getTitle())
-                    .content(note.getContent())
-                    .createdAt(note.getCreatedAt())
-                    .updatedAt(note.getUpdatedAt())
-                    .isFavourite(false)
-                    .build();
-            noteTakingRepository.save(updatedNote);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public List<Note> getAllFavoriteNotes() {
         List<Note> allNotes = this.noteTakingRepository.findAll();
@@ -110,4 +85,5 @@ public class NoteTakingService {
                 .collect(Collectors.toList());
         return favoriteNotes;
     }
+
 }

@@ -6,6 +6,7 @@ import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
+@CrossOrigin(origins = " http://localhost:3000")
 @RestController
+
 @RequestMapping("/notes")
 @RequiredArgsConstructor
 public class NoteTakingController {
@@ -50,21 +52,12 @@ public class NoteTakingController {
         noteTakingService.deleteNoteById(id);
     }
 
-    @PutMapping("/favorite/{noteId}")
-    public ResponseEntity<?> addNoteToFavorites(@PathVariable Long noteId) {
-        boolean isAdded = noteTakingService.addNoteToFavorites(noteId);
-        if (isAdded) {
-            return ResponseEntity.ok().body("Note has been added to favorites.");
-        } else {
-            return ResponseEntity.badRequest().body("Note not found.");
-        }
-    }
 
-    @PutMapping("/unfavorite/{noteId}")
-    public ResponseEntity<?> removeNoteFromFavorites(@PathVariable Long noteId) {
-        boolean isRemoved = noteTakingService.removeNoteFromFavorites(noteId);
-        if (isRemoved) {
-            return ResponseEntity.ok().body("Note has been removed from favorites.");
+    @PutMapping("/toggleFavorite/{noteId}")
+    public ResponseEntity<?> toggleFavorite(@PathVariable Long noteId) {
+        boolean isToggled = noteTakingService.toggleFavorite(noteId);
+        if (isToggled) {
+            return ResponseEntity.ok().body("Note favorite status has been toggled.");
         } else {
             return ResponseEntity.badRequest().body("Note not found.");
         }

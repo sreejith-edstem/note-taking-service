@@ -2,6 +2,7 @@ package notetakingapplication.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -154,5 +155,15 @@ public class NoteTakingServiceTest {
 
         verify(noteTakingRepository, times(1)).save(any(Note.class));
         assert(isRemoved);
+    }
+    @Test
+    public void testGetAllFavoriteNotes() {
+        List<Note> favoriteNotes = noteTakingService.getAllFavoriteNotes();
+
+        assertTrue(favoriteNotes.stream().allMatch(Note::isFavourite), "All notes should be favorites");
+
+        for (int i = 0; i < favoriteNotes.size() - 1; i++) {
+            assertTrue(favoriteNotes.get(i).getUpdatedAt().compareTo(favoriteNotes.get(i + 1).getUpdatedAt()) >= 0, "Notes should be sorted by updatedAt in descending order");
+        }
     }
 }
