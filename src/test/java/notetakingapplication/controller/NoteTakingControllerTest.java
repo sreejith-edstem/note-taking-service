@@ -85,4 +85,16 @@ public class NoteTakingControllerTest {
 
         mockMvc.perform(delete("/notes/" + id)).andExpect(status().isOk());
     }
+    @Test
+    public void testToggleFavorite() throws Exception {
+        Long noteId = 1L;
+        mockMvc.perform(MockMvcRequestBuilders.put("/notes/toggleFavorite/" + noteId))
+                .andExpect(status().isOk());
+    }
+    @Test
+    public void testGetAllFavoriteNotes() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/favorites"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"));
+    }
 }

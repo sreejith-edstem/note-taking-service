@@ -1,18 +1,5 @@
 package notetakingapplication.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -21,6 +8,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class NoteTakingServiceTest {
     private NoteTakingRepository noteTakingRepository;
@@ -141,8 +142,14 @@ public class NoteTakingServiceTest {
     @Test
     public void testToggleFavorite() {
         Long noteId = 1L;
-        boolean isToggled = noteTakingService.toggleFavorite(noteId);
-        assertTrue(isToggled, "Expected toggleFavorite to return false");
+        Note note = new Note();
+
+        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
+
+        boolean result = noteTakingService.toggleFavorite(noteId);
+
+        assertTrue(result);
+        verify(noteTakingRepository, times(1)).save(any(Note.class));
     }
 
     @Test

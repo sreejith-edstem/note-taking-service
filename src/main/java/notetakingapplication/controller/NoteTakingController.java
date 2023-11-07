@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,19 +53,14 @@ public class NoteTakingController {
 
 
     @PutMapping("/toggleFavorite/{noteId}")
-    public ResponseEntity<?> toggleFavorite(@PathVariable Long noteId) {
-        boolean isToggled = noteTakingService.toggleFavorite(noteId);
-        if (isToggled) {
-            return ResponseEntity.ok().body("Note favorite status has been toggled.");
-        } else {
-            return ResponseEntity.badRequest().body("Note not found.");
-        }
+    public @ResponseBody String toggleFavorite(@PathVariable Long noteId) {
+        noteTakingService.toggleFavorite(noteId);
+        return "Note favorite status has been toggled.";
     }
 
     @GetMapping("/favorites")
-    public ResponseEntity<?> getAllFavoriteNotes() {
-        List<Note> favoriteNotes = noteTakingService.getAllFavoriteNotes();
-        return ResponseEntity.ok().body(favoriteNotes);
+    public @ResponseBody List<Note> getAllFavoriteNotes() {
+        return noteTakingService.getAllFavoriteNotes();
     }
 
 }
