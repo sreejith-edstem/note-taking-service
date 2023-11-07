@@ -63,20 +63,11 @@
 			"response": []
 		},
 		{
-			"name": "Added to favorites",
+			"name": "Toggle favorites",
 			"request": {
 				"method": "PUT",
 				"header": [],
-				"url": "http://localhost:8080/notes/1/favorite"
-			},
-			"response": []
-		},
-		{
-			"name": "Remove from favorite",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"url": "http://localhost:8080/notes/1/removeFavorite"
+				"url": "http://localhost:8080/notes/toggleFavorite/4"
 			},
 			"response": []
 		},
