@@ -19,10 +19,12 @@ public class NoteTakingService {
     private final NoteTakingRepository noteTakingRepository;
     private final ModelMapper modelMapper;
 
-    public long addNotes(NoteTakingRequest request) {
-        Note note = noteTakingRepository.save(modelMapper.map(request, Note.class));
-        return note.getId();
+    public Note addNotes(NoteTakingRequest request) {
+        Note note = modelMapper.map(request, Note.class);
+        note = noteTakingRepository.save(note);
+        return note;
     }
+
 
     public List<Note> getAllNotesSortedByUpdatedDate() {
         return noteTakingRepository.findAllByOrderByUpdatedAtDesc();
@@ -36,7 +38,7 @@ public class NoteTakingService {
         return note.get();
     }
 
-    public Long updateNoteById(long id, NoteTakingRequest request) {
+    public Note updateNoteById(long id, NoteTakingRequest request) {
         Optional<Note> note = this.noteTakingRepository.findById(id);
         if (!note.isPresent()) {
             throw new RuntimeException("Note not found");
@@ -51,20 +53,20 @@ public class NoteTakingService {
                     .updatedAt(LocalDateTime.now())
                     .build();
             noteTakingRepository.save(updatedNote);
-            return updatedNote.getId();
+            return updatedNote;
         }
-
     }
 
-    public void deleteNoteById(long id) {
+    public long deleteNoteById(long id) {
         if (!noteTakingRepository.existsById(id)) {
             throw new RuntimeException("Note not found");
         }
         noteTakingRepository.deleteById(id);
+        return id;
     }
 
 
-    public boolean toggleFavorite(Long noteId) {
+    public Note toggleFavorite(Long noteId) {
         Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
 
         if (optionalNote.isPresent()) {
@@ -78,9 +80,9 @@ public class NoteTakingService {
                     .isFavourite(!note.isFavourite())
                     .build();
             noteTakingRepository.save(updatedNote);
-            return true;
+            return updatedNote;
         } else {
-            return false;
+            throw new RuntimeException("Note not found");
         }
     }
 
@@ -94,4 +96,32 @@ public class NoteTakingService {
         return favoriteNotes;
     }
 
+    public boolean toggleSoftDelete(Long noteId) {
+        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
+
+        if (optionalNote.isPresent()) {
+            Note note = optionalNote.get();
+            Note updatedNote = Note.builder()
+                    .id(note.getId())
+                    .title(note.getTitle())
+                    .content(note.getContent())
+                    .createdAt(note.getCreatedAt())
+                    .updatedAt(note.getUpdatedAt())
+                    .isFavourite(note.isFavourite())
+                    .isDeleted(!note.isDeleted())
+                    .build();
+            noteTakingRepository.save(updatedNote);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public List<Note> getAllDeletedNotesSortedByUpdatedDate() {
+        return noteTakingRepository.findAllByIsDeletedTrueOrderByUpdatedAtDesc();
+    }
+
+    public List<Note> getAllUndeletedNotesSortedByUpdatedDate() {
+        return noteTakingRepository.findAllByIsDeletedFalseOrderByUpdatedAtDesc();
+    }
 }

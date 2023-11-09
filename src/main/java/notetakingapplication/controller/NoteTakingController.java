@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://127.0.0.1:5173/")
 @RequestMapping("/notes")
 @RequiredArgsConstructor
 public class NoteTakingController {
     private final NoteTakingService noteTakingService;
 
     @PostMapping
-    public @ResponseBody Long addNotes(@Valid @RequestBody NoteTakingRequest request) {
+    public @ResponseBody Note addNotes(@Valid @RequestBody NoteTakingRequest request) {
         return this.noteTakingService.addNotes(request);
     }
 
@@ -41,26 +41,42 @@ public class NoteTakingController {
     }
 
     @PutMapping("/{id}")
-    public @ResponseBody Long updateNoteById(
+    public @ResponseBody Note updateNoteById(
             @PathVariable long id, @Valid @RequestBody NoteTakingRequest request) {
         return noteTakingService.updateNoteById(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public @ResponseBody void deleteNoteById(@PathVariable long id) {
+    public @ResponseBody long deleteNoteById(@PathVariable long id) {
         noteTakingService.deleteNoteById(id);
+        return id;
     }
 
-
     @PutMapping("/toggleFavorite/{noteId}")
-    public @ResponseBody String toggleFavorite(@PathVariable Long noteId) {
-        noteTakingService.toggleFavorite(noteId);
-        return "Note favorite status has been toggled.";
+    public Note toggleFavorite(@PathVariable Long noteId) {
+        Note isToggled = noteTakingService.toggleFavorite(noteId);
+        return isToggled;
     }
 
     @GetMapping("/favorites")
     public @ResponseBody List<Note> getAllFavoriteNotes() {
         return noteTakingService.getAllFavoriteNotes();
+    }
+
+    @DeleteMapping("/toggleSoftDelete/{noteId}")
+    public @ResponseBody String toggleSoftDelete(@PathVariable Long noteId) {
+        noteTakingService.toggleSoftDelete(noteId);
+        return "Note delete status has been toggled.";
+    }
+
+    @GetMapping("/deleted")
+    public @ResponseBody List<Note> getAllDeletedNotes() {
+        return noteTakingService.getAllDeletedNotesSortedByUpdatedDate();
+    }
+
+    @GetMapping("/undeleted")
+    public @ResponseBody List<Note> getAllUndeletedNotes() {
+        return noteTakingService.getAllUndeletedNotesSortedByUpdatedDate();
     }
 
 }

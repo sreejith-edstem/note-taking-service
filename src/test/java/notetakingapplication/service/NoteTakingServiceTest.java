@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,5 +162,56 @@ public class NoteTakingServiceTest {
         for (int i = 0; i < favoriteNotes.size() - 1; i++) {
             assertTrue(favoriteNotes.get(i).getUpdatedAt().compareTo(favoriteNotes.get(i + 1).getUpdatedAt()) >= 0, "Notes should be sorted by updatedAt in descending order");
         }
+    }
+    @Test
+    public void testToggleSoftDelete() {
+        Long noteId = 1L;
+        Note note = Note.builder()
+                .id(noteId)
+                .title("Test Title")
+                .content("Test Content")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .isFavourite(false)
+                .isDeleted(false)
+                .build();
+        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
+
+        boolean result = noteTakingService.toggleSoftDelete(noteId);
+
+        assertTrue(result);
+        verify(noteTakingRepository, times(1)).findById(noteId);
+        verify(noteTakingRepository, times(1)).save(any(Note.class));
+    }
+    @Test
+    public void testToggleSoftDelete_NoteNotFound() {
+        Long noteId = 1L;
+        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.empty());
+
+        boolean result = noteTakingService.toggleSoftDelete(noteId);
+
+        assertFalse(result);
+        verify(noteTakingRepository, times(1)).findById(noteId);
+        verify(noteTakingRepository, times(0)).save(any(Note.class));
+    }
+    @Test
+    public void testGetAllDeletedNotesSortedByUpdatedDate() {
+        Note note = new Note();
+        when(noteTakingRepository.findAllByIsDeletedTrueOrderByUpdatedAtDesc()).thenReturn(Collections.singletonList(note));
+
+        List<Note> notes = noteTakingService.getAllDeletedNotesSortedByUpdatedDate();
+
+        assertFalse(notes.isEmpty());
+        verify(noteTakingRepository, times(1)).findAllByIsDeletedTrueOrderByUpdatedAtDesc();
+    }
+    @Test
+    public void testGetAllUnDeletedNotesSortedByUpdatedDate() {
+        Note note = new Note();
+        when(noteTakingRepository.findAllByIsDeletedFalseOrderByUpdatedAtDesc()).thenReturn(Collections.singletonList(note));
+
+        List<Note> notes = noteTakingService.getAllUndeletedNotesSortedByUpdatedDate();
+
+        assertFalse(notes.isEmpty());
+        verify(noteTakingRepository, times(1)).findAllByIsDeletedFalseOrderByUpdatedAtDesc();
     }
 }
