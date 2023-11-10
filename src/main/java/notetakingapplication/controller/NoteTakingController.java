@@ -64,9 +64,9 @@ public class NoteTakingController {
     }
 
     @DeleteMapping("/toggleSoftDelete/{noteId}")
-    public @ResponseBody String toggleSoftDelete(@PathVariable Long noteId) {
+    public @ResponseBody long toggleSoftDelete(@PathVariable Long noteId) {
         noteTakingService.toggleSoftDelete(noteId);
-        return "Note delete status has been toggled.";
+        return noteId;
     }
 
     @GetMapping("/deleted")

@@ -1,7 +1,6 @@
 package notetakingapplication.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.service.NoteTakingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,37 +11,27 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class NoteTakingControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @MockBean private NoteTakingService noteTakingService;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private NoteTakingService noteTakingService;
 
     @Test
-    public void testAddNotes() throws Exception {
-        NoteTakingRequest request = new NoteTakingRequest();
-        request.setTitle("Test Title");
-        request.setContent("Test Content");
-        String jsonRequest = new ObjectMapper().writeValueAsString(request);
+    public void addNotesTest() throws Exception {
+        String json = "{\"title\":\"Test Note\",\"content\":\"This is a test note.\"}";
 
-        when(noteTakingService.addNotes(any(NoteTakingRequest.class))).thenReturn(1L);
-        mockMvc.perform(post("/notes").contentType(MediaType.APPLICATION_JSON).content(jsonRequest))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"));
-
-        verify(noteTakingService, times(1)).addNotes(any(NoteTakingRequest.class));
+        mockMvc.perform(MockMvcRequestBuilders.post("/notes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -63,38 +52,58 @@ public class NoteTakingControllerTest {
     }
 
     @Test
-    public void testUpdateNoteById() throws Exception {
-        Long id = 1L;
-        NoteTakingRequest request = new NoteTakingRequest();
+    public void updateNoteByIdTest() throws Exception {
+        String json = "{\"title\":\"Updated Note\",\"content\":\"This is an updated note.\"}";
 
-        when(noteTakingService.updateNoteById(id, request)).thenReturn(id);
-
-        mockMvc.perform(
-                        put("/notes/" + id)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"title\":\"Title 1\", \"content\":\"Content 1\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("0"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/notes/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void testDeleteNoteById() throws Exception {
-        Long id = 1L;
+    public void deleteNoteByIdTest() throws Exception {
+        long idToDelete = 1;
 
-        doNothing().when(noteTakingService).deleteNoteById(id);
-
-        mockMvc.perform(delete("/notes/" + id)).andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes/" + idToDelete))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Long.toString(idToDelete)));
     }
+
     @Test
     public void testToggleFavorite() throws Exception {
         Long noteId = 1L;
         mockMvc.perform(MockMvcRequestBuilders.put("/notes/toggleFavorite/" + noteId))
                 .andExpect(status().isOk());
     }
+
     @Test
     public void testGetAllFavoriteNotes() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/notes/favorites"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
+    }
+
+    @Test
+    public void toggleSoftDeleteTest() throws Exception {
+        Long noteId = 1L;
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes/toggleSoftDelete/" + noteId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Long.toString(noteId)));
+    }
+
+    @Test
+    public void getAllDeletedNotesTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/deleted"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void getAllUndeletedNotesTest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/undeleted"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 }

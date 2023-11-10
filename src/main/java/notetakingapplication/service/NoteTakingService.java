@@ -25,7 +25,6 @@ public class NoteTakingService {
         return note;
     }
 
-
     public List<Note> getAllNotesSortedByUpdatedDate() {
         return noteTakingRepository.findAllByOrderByUpdatedAtDesc();
     }
@@ -65,7 +64,6 @@ public class NoteTakingService {
         return id;
     }
 
-
     public Note toggleFavorite(Long noteId) {
         Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
 
@@ -86,17 +84,17 @@ public class NoteTakingService {
         }
     }
 
-
     public List<Note> getAllFavoriteNotes() {
         List<Note> allNotes = this.noteTakingRepository.findAll();
         List<Note> favoriteNotes = allNotes.stream()
                 .filter(Note::isFavourite)
+                .filter(note -> !note.isDeleted())
                 .sorted(Comparator.comparing(Note::getUpdatedAt).reversed())
                 .collect(Collectors.toList());
         return favoriteNotes;
     }
 
-    public boolean toggleSoftDelete(Long noteId) {
+    public long toggleSoftDelete(Long noteId) {
         Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
 
         if (optionalNote.isPresent()) {
@@ -111,9 +109,9 @@ public class NoteTakingService {
                     .isDeleted(!note.isDeleted())
                     .build();
             noteTakingRepository.save(updatedNote);
-            return true;
+            return noteId;
         } else {
-            return false;
+            throw new RuntimeException("Note not found");
         }
     }
 

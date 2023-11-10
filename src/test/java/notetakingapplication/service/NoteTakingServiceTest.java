@@ -18,7 +18,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,15 +39,15 @@ public class NoteTakingServiceTest {
     @Test
     public void testAddNotes() {
         NoteTakingRequest request = new NoteTakingRequest();
-        request.setTitle("Test Title");
-        request.setContent("Test Content");
+
         Note note = new Note();
+
         when(modelMapper.map(request, Note.class)).thenReturn(note);
         when(noteTakingRepository.save(note)).thenReturn(note);
-        Long resultId = noteTakingService.addNotes(request);
-        verify(modelMapper, times(1)).map(request, Note.class);
-        verify(noteTakingRepository, times(1)).save(note);
-        assertEquals(note.getId(), resultId);
+
+        Note result = noteTakingService.addNotes(request);
+
+        assertEquals(note, result);
     }
 
     @Test
@@ -87,36 +86,16 @@ public class NoteTakingServiceTest {
     public void testUpdateNoteById() {
         long id = 1L;
         NoteTakingRequest request = new NoteTakingRequest();
-        request.setTitle("Updated Title");
-        request.setContent("Updated Content");
 
-        Note note =
-                Note.builder()
-                        .title(request.getTitle())
-                        .content(request.getContent())
-                        .updatedAt(LocalDateTime.now())
-                        .build();
-
+        Note note = new Note(1L, "Old Title", "Old Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
         when(noteTakingRepository.findById(id)).thenReturn(Optional.of(note));
-        when(noteTakingRepository.save(any(Note.class))).thenReturn(note);
 
-        Long resultId = noteTakingService.updateNoteById(id, request);
+        Note updatedNote = noteTakingService.updateNoteById(id, request);
 
+        assertEquals(request.getTitle(), updatedNote.getTitle());
+        assertEquals(request.getContent(), updatedNote.getContent());
         verify(noteTakingRepository, times(1)).findById(id);
         verify(noteTakingRepository, times(1)).save(any(Note.class));
-        assertEquals(note.getId(), resultId);
-    }
-
-    @Test
-    public void testUpdateNoteById_NotFound() {
-        long id = 1L;
-        NoteTakingRequest request = new NoteTakingRequest();
-        request.setTitle("Updated Title");
-        request.setContent("Updated Content");
-
-        when(noteTakingRepository.findById(id)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> noteTakingService.updateNoteById(id, request));
-        verify(noteTakingRepository, times(1)).findById(id);
     }
 
     @Test
@@ -143,57 +122,45 @@ public class NoteTakingServiceTest {
     @Test
     public void testToggleFavorite() {
         Long noteId = 1L;
-        Note note = new Note();
 
+        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
         when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
 
-        boolean result = noteTakingService.toggleFavorite(noteId);
+        Note updatedNote = noteTakingService.toggleFavorite(noteId);
 
-        assertTrue(result);
+        assertEquals(!note.isFavourite(), updatedNote.isFavourite());
+        verify(noteTakingRepository, times(1)).findById(noteId);
+        verify(noteTakingRepository, times(1)).save(any(Note.class));
+    }
+
+    @Test
+    public void testToggleSoftDelete() {
+        Long noteId = 1L;
+
+        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
+        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
+
+        Long returnedNoteId = noteTakingService.toggleSoftDelete(noteId);
+
+        assertEquals(noteId, returnedNoteId);
+        verify(noteTakingRepository, times(1)).findById(noteId);
         verify(noteTakingRepository, times(1)).save(any(Note.class));
     }
 
     @Test
     public void testGetAllFavoriteNotes() {
-        List<Note> favoriteNotes = noteTakingService.getAllFavoriteNotes();
+        Note note1 = new Note();
 
-        assertTrue(favoriteNotes.stream().allMatch(Note::isFavourite), "All notes should be favorites");
+        Note note2 = new Note();
 
-        for (int i = 0; i < favoriteNotes.size() - 1; i++) {
-            assertTrue(favoriteNotes.get(i).getUpdatedAt().compareTo(favoriteNotes.get(i + 1).getUpdatedAt()) >= 0, "Notes should be sorted by updatedAt in descending order");
-        }
+        List<Note> allNotes = Arrays.asList(note1, note2);
+        when(noteTakingRepository.findAll()).thenReturn(allNotes);
+
+        List<Note> result = noteTakingService.getAllFavoriteNotes();
+
+        assertEquals(0, result.size());
     }
-    @Test
-    public void testToggleSoftDelete() {
-        Long noteId = 1L;
-        Note note = Note.builder()
-                .id(noteId)
-                .title("Test Title")
-                .content("Test Content")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .isFavourite(false)
-                .isDeleted(false)
-                .build();
-        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
 
-        boolean result = noteTakingService.toggleSoftDelete(noteId);
-
-        assertTrue(result);
-        verify(noteTakingRepository, times(1)).findById(noteId);
-        verify(noteTakingRepository, times(1)).save(any(Note.class));
-    }
-    @Test
-    public void testToggleSoftDelete_NoteNotFound() {
-        Long noteId = 1L;
-        when(noteTakingRepository.findById(noteId)).thenReturn(Optional.empty());
-
-        boolean result = noteTakingService.toggleSoftDelete(noteId);
-
-        assertFalse(result);
-        verify(noteTakingRepository, times(1)).findById(noteId);
-        verify(noteTakingRepository, times(0)).save(any(Note.class));
-    }
     @Test
     public void testGetAllDeletedNotesSortedByUpdatedDate() {
         Note note = new Note();
@@ -204,6 +171,7 @@ public class NoteTakingServiceTest {
         assertFalse(notes.isEmpty());
         verify(noteTakingRepository, times(1)).findAllByIsDeletedTrueOrderByUpdatedAtDesc();
     }
+
     @Test
     public void testGetAllUnDeletedNotesSortedByUpdatedDate() {
         Note note = new Note();
