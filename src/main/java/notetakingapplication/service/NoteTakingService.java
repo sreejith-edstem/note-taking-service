@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,30 +29,24 @@ public class NoteTakingService {
     }
 
     public Note getNoteById(long id) {
-        Optional<Note> note = this.noteTakingRepository.findById(id);
-        if (!note.isPresent()) {
-            throw new RuntimeException("Note not found");
-        }
-        return note.get();
+        Note note = this.noteTakingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        return note;
     }
 
     public Note updateNoteById(long id, NoteTakingRequest request) {
-        Optional<Note> note = this.noteTakingRepository.findById(id);
-        if (!note.isPresent()) {
-            throw new RuntimeException("Note not found");
-        } else {
-            Note updatedNote = note.get();
-            updatedNote = Note.builder()
-                    .id(updatedNote.getId())
-                    .createdAt(updatedNote.getCreatedAt())
-                    .isFavourite(updatedNote.isFavourite())
-                    .title(request.getTitle())
-                    .content(request.getContent())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            noteTakingRepository.save(updatedNote);
-            return updatedNote;
-        }
+        Note updatedNote = this.noteTakingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        updatedNote = Note.builder()
+                .id(updatedNote.getId())
+                .createdAt(updatedNote.getCreatedAt())
+                .isFavourite(updatedNote.isFavourite())
+                .title(request.getTitle())
+                .content(request.getContent())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        noteTakingRepository.save(updatedNote);
+        return updatedNote;
     }
 
     public long deleteNoteById(long id) {
@@ -65,23 +58,18 @@ public class NoteTakingService {
     }
 
     public Note toggleFavorite(Long noteId) {
-        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
-
-        if (optionalNote.isPresent()) {
-            Note note = optionalNote.get();
-            Note updatedNote = Note.builder()
-                    .id(note.getId())
-                    .title(note.getTitle())
-                    .content(note.getContent())
-                    .createdAt(note.getCreatedAt())
-                    .updatedAt(note.getUpdatedAt())
-                    .isFavourite(!note.isFavourite())
-                    .build();
-            noteTakingRepository.save(updatedNote);
-            return updatedNote;
-        } else {
-            throw new RuntimeException("Note not found");
-        }
+        Note note = this.noteTakingRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        note = Note.builder()
+                .id(note.getId())
+                .title(note.getTitle())
+                .content(note.getContent())
+                .createdAt(note.getCreatedAt())
+                .updatedAt(note.getUpdatedAt())
+                .isFavourite(!note.isFavourite())
+                .build();
+        noteTakingRepository.save(note);
+        return note;
     }
 
     public List<Note> getAllFavoriteNotes() {
@@ -95,24 +83,19 @@ public class NoteTakingService {
     }
 
     public long toggleSoftDelete(Long noteId) {
-        Optional<Note> optionalNote = noteTakingRepository.findById(noteId);
-
-        if (optionalNote.isPresent()) {
-            Note note = optionalNote.get();
-            Note updatedNote = Note.builder()
-                    .id(note.getId())
-                    .title(note.getTitle())
-                    .content(note.getContent())
-                    .createdAt(note.getCreatedAt())
-                    .updatedAt(note.getUpdatedAt())
-                    .isFavourite(note.isFavourite())
-                    .isDeleted(!note.isDeleted())
-                    .build();
-            noteTakingRepository.save(updatedNote);
-            return noteId;
-        } else {
-            throw new RuntimeException("Note not found");
-        }
+        Note note = this.noteTakingRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        note = Note.builder()
+                .id(note.getId())
+                .title(note.getTitle())
+                .content(note.getContent())
+                .createdAt(note.getCreatedAt())
+                .updatedAt(note.getUpdatedAt())
+                .isFavourite(note.isFavourite())
+                .isDeleted(!note.isDeleted())
+                .build();
+        noteTakingRepository.save(note);
+        return noteId;
     }
 
     public List<Note> getAllDeletedNotesSortedByUpdatedDate() {

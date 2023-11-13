@@ -7,23 +7,11 @@
 	},
 	"item": [
 		{
-			"name": "Getting notes",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "Getting undeleted notes",
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"title\" : \"Pollution\",\r\n    \"content\" : \"Our earth is a pollution\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://localhost:8080/notes/2"
+				"url": "http://localhost:8080/notes"
 			},
 			"response": []
 		},
@@ -76,7 +64,60 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8080/notes/favorites"
+				"url": {
+					"raw": "http://localhost:8080/notes/favorites",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"notes",
+						"favorites"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "Boogie",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Toggle Soft delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/notes/toggleSoftDelete/6"
+			},
+			"response": []
+		},
+		{
+			"name": "Get deleted notes",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Getting all notes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/notes"
+			},
+			"response": []
+		},
+		{
+			"name": "Getting note by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/notes"
 			},
 			"response": []
 		}
