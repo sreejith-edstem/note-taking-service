@@ -1,6 +1,8 @@
 package notetakingapplication.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -8,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import notetakingapplication.constants.Folder;
 
 import java.time.LocalDateTime;
 
@@ -26,4 +29,6 @@ public class Note {
     private LocalDateTime updatedAt = LocalDateTime.now();
     private boolean isFavourite;
     private boolean isDeleted;
+    @Enumerated(EnumType.STRING)
+    private Folder folder;
 }

@@ -1,6 +1,7 @@
 package notetakingapplication.service;
 
 import lombok.RequiredArgsConstructor;
+import notetakingapplication.constants.Folder;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -9,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +44,7 @@ public class NoteTakingService {
                 .id(updatedNote.getId())
                 .createdAt(updatedNote.getCreatedAt())
                 .isFavourite(updatedNote.isFavourite())
+                .folder(updatedNote.getFolder())
                 .title(request.getTitle())
                 .content(request.getContent())
                 .updatedAt(LocalDateTime.now())
@@ -66,6 +70,7 @@ public class NoteTakingService {
                 .content(note.getContent())
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
+                .folder(note.getFolder())
                 .isFavourite(!note.isFavourite())
                 .build();
         noteTakingRepository.save(note);
@@ -92,6 +97,7 @@ public class NoteTakingService {
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
                 .isFavourite(note.isFavourite())
+                .folder(note.getFolder())
                 .isDeleted(!note.isDeleted())
                 .build();
         noteTakingRepository.save(note);
@@ -104,5 +110,14 @@ public class NoteTakingService {
 
     public List<Note> getAllUndeletedNotesSortedByUpdatedDate() {
         return noteTakingRepository.findAllByIsDeletedFalseOrderByUpdatedAtDesc();
+    }
+
+
+    public List<Note> getAllNotesByFolder(Folder folder) {
+        List<Note> allNotes = this.noteTakingRepository.findAll();
+        List<Note> notesByFolder = allNotes.stream()
+                .filter(note -> note.getFolder() == folder && !note.isDeleted())
+                .collect(Collectors.toList());
+        return notesByFolder;
     }
 }
