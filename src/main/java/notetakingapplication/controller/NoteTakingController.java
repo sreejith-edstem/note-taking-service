@@ -2,7 +2,7 @@ package notetakingapplication.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import notetakingapplication.constants.Folder;
+import notetakingapplication.constant.Folder;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:5173/")
@@ -82,24 +82,15 @@ public class NoteTakingController {
     public @ResponseBody List<Note> getAllUndeletedNotes() {
         return noteTakingService.getAllUndeletedNotesSortedByUpdatedDate();
     }
-//    @GetMapping("/NotesByFolder")
-//    public ResponseEntity<Map<Folder, List<Note>>> getAllNotesByFolder() {
-//        Map<Folder, List<Note>> favoriteNotesByFolder = noteTakingService.getAllNotesByFolder();
-//        return ResponseEntity.ok(favoriteNotesByFolder);
-//    }
-//    @GetMapping("by-Folder/{folder}")
-//    public @ResponseBody List<Note> getNotesByFolders(@PathVariable Folder folder){
-//        List<Note> sortedNotes = noteTakingService.getAllNotesByFolder(folder);
-//        return sortedNotes;
-//    }
-//@GetMapping("/byFolder/{folder}")
-//public ResponseEntity<List<Note>> getAllNotesByFolder(@PathVariable Folder folder) {
-//    List<Note> notes = noteTakingService.getAllNotesByFolder(folder);
-//    return new ResponseEntity<>(notes, HttpStatus.OK);
-//}
+
     @GetMapping("/byFolder/{folder}")
     public @ResponseBody List<Note> getAllNotesByFolder(@PathVariable Folder folder) {
         return noteTakingService.getAllNotesByFolder(folder);
+    }
+
+    @GetMapping("/search")
+    public @ResponseBody List<Note> searchNotesByTitle(@RequestParam String title) {
+        return noteTakingService.getNotesByTitle(title);
     }
 
 

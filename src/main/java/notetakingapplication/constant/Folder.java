@@ -1,4 +1,4 @@
-package notetakingapplication.constants;
+package notetakingapplication.constant;
 
 public enum Folder {
     Personal,

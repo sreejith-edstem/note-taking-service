@@ -1,7 +1,7 @@
 package notetakingapplication.service;
 
 import lombok.RequiredArgsConstructor;
-import notetakingapplication.constants.Folder;
+import notetakingapplication.constant.Folder;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -120,4 +118,13 @@ public class NoteTakingService {
                 .collect(Collectors.toList());
         return notesByFolder;
     }
+
+    public List<Note> getNotesByTitle(String title) {
+        List<Note> allNotes = this.noteTakingRepository.findAll();
+        List<Note> notesByTitle = allNotes.stream()
+                .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()) && !note.isDeleted())
+                .collect(Collectors.toList());
+        return notesByTitle;
+    }
+
 }

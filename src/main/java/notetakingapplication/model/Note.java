@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import notetakingapplication.constants.Folder;
+import notetakingapplication.constant.Folder;
 
 import java.time.LocalDateTime;
 

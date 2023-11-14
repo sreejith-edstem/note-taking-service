@@ -120,6 +120,23 @@
 				"url": "http://localhost:8080/notes"
 			},
 			"response": []
+		},
+		{
+			"name": "Get notes by folder",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/notes/favoriteNotesByFolder"
+			},
+			"response": []
+		},
+		{
+			"name": "Search a note",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }

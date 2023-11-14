@@ -5,7 +5,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import notetakingapplication.constants.Folder;
+import notetakingapplication.constant.Folder;
 
 @Getter
 @Setter
