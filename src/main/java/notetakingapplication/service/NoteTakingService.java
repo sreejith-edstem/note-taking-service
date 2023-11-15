@@ -119,12 +119,14 @@ public class NoteTakingService {
         return notesByFolder;
     }
 
-    public List<Note> getNotesByTitle(String title) {
+    public List<Note> searchNotesByTitle(String title) {
         List<Note> allNotes = this.noteTakingRepository.findAll();
         List<Note> notesByTitle = allNotes.stream()
                 .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()) && !note.isDeleted())
                 .collect(Collectors.toList());
         return notesByTitle;
     }
+
+
 
 }

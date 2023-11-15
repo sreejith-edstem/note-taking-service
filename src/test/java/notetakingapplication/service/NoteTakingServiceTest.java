@@ -1,5 +1,6 @@
 package notetakingapplication.service;
 
+import notetakingapplication.constant.Folder;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.repository.NoteTakingRepository;
@@ -10,15 +11,19 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -87,7 +92,7 @@ public class NoteTakingServiceTest {
         long id = 1L;
         NoteTakingRequest request = new NoteTakingRequest();
 
-        Note note = new Note(1L, "Old Title", "Old Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
+        Note note = new Note(1L, "Old Title", "Old Content", LocalDateTime.now(), LocalDateTime.now(), false, false, Folder.valueOf("Personal"));
         when(noteTakingRepository.findById(id)).thenReturn(Optional.of(note));
 
         Note updatedNote = noteTakingService.updateNoteById(id, request);
@@ -123,7 +128,7 @@ public class NoteTakingServiceTest {
     public void testToggleFavorite() {
         Long noteId = 1L;
 
-        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
+        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false, Folder.valueOf("Personal"));
         when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
 
         Note updatedNote = noteTakingService.toggleFavorite(noteId);
@@ -137,7 +142,7 @@ public class NoteTakingServiceTest {
     public void testToggleSoftDelete() {
         Long noteId = 1L;
 
-        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false);
+        Note note = new Note(1L, "Title", "Content", LocalDateTime.now(), LocalDateTime.now(), false, false, Folder.valueOf("Personal"));
         when(noteTakingRepository.findById(noteId)).thenReturn(Optional.of(note));
 
         Long returnedNoteId = noteTakingService.toggleSoftDelete(noteId);
@@ -181,5 +186,36 @@ public class NoteTakingServiceTest {
 
         assertFalse(notes.isEmpty());
         verify(noteTakingRepository, times(1)).findAllByIsDeletedFalseOrderByUpdatedAtDesc();
+    }
+
+    @Test
+    public void getAllNotesByFolderTest() {
+        Note note1 = new Note();
+        Note note2 = new Note();
+        Note note3 = new Note();
+        List<Note> allNotes = Arrays.asList(note1, note2, note3);
+
+        given(noteTakingRepository.findAll()).willReturn(allNotes);
+        List<Note> result = noteTakingService.getAllNotesByFolder(Folder.Personal);
+
+        List<Note> expected = allNotes.stream()
+                .filter(note -> note.getFolder() == Folder.Personal && !note.isDeleted())
+                .collect(Collectors.toList());
+        assertEquals(expected, result);
+
+        then(noteTakingRepository).should(times(1)).findAll();
+    }
+
+    @Test
+    public void testSearchNotesByTitle() {
+        String title = "Test Title";
+        List<Note> allNotes = new ArrayList<>();
+        when(noteTakingRepository.findAll()).thenReturn(allNotes);
+        List<Note> actualNotes = noteTakingService.searchNotesByTitle(title);
+        List<Note> expectedNotes = allNotes.stream()
+                .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()) && !note.isDeleted())
+                .collect(Collectors.toList());
+        assertEquals(expectedNotes, actualNotes);
+        Mockito.verify(noteTakingRepository).findAll();
     }
 }

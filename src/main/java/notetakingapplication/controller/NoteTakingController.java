@@ -6,8 +6,6 @@ import notetakingapplication.constant.Folder;
 import notetakingapplication.contract.request.NoteTakingRequest;
 import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,8 +88,7 @@ public class NoteTakingController {
 
     @GetMapping("/search")
     public @ResponseBody List<Note> searchNotesByTitle(@RequestParam String title) {
-        return noteTakingService.getNotesByTitle(title);
+        return noteTakingService.searchNotesByTitle(title);
     }
-
 
 }

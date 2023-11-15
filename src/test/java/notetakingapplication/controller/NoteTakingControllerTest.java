@@ -1,6 +1,8 @@
 package notetakingapplication.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import notetakingapplication.constant.Folder;
+import notetakingapplication.model.Note;
 import notetakingapplication.service.NoteTakingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -101,9 +104,11 @@ public class NoteTakingControllerTest {
     }
 
     @Test
-    public void getAllUndeletedNotesTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes/undeleted"))
+    public void testGetAllNotesByFolder() throws Exception {
+        String folder = Folder.Personal.name();
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/byFolder/" + folder))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
+
 }
