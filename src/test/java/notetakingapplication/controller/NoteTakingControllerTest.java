@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,7 +86,24 @@ public class NoteTakingControllerTest {
 
     @Test
     public void testGetAllFavoriteNotes() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes/favorites"))
+        String title = "Title1";
+
+        Note note1 = Note.builder()
+                .isFavourite(true)
+                .isDeleted(false)
+                .title("Title1")
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        Note note2 = Note.builder()
+                .isFavourite(false)
+                .isDeleted(false)
+                .title("Title2")
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
+        List<Note> allNotes = Arrays.asList(note1, note2);
+        when(noteTakingService.getAllFavoriteNotes(title)).thenReturn(allNotes);
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/favorites").param("title", title))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"));
     }
@@ -101,7 +119,21 @@ public class NoteTakingControllerTest {
 
     @Test
     public void getAllDeletedNotesTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes/deleted"))
+        String title = "Title1";
+        Note note1 = Note.builder()
+                .isDeleted(true)
+                .title("Title1")
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        Note note2 = Note.builder()
+                .isDeleted(true)
+                .title("Title2")
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
+        List<Note> allNotes = Arrays.asList(note1, note2);
+        when(noteTakingService.getAllDeletedNotesSortedByUpdatedDate(title)).thenReturn(allNotes);
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/deleted").param("title", title))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
@@ -127,11 +159,26 @@ public class NoteTakingControllerTest {
 
     @Test
     public void testGetAllNotesByFolder() throws Exception {
+        String title = "Title1";
         String folder = Folder.Personal.name();
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes/byFolder/" + folder))
+        Note note1 = Note.builder()
+                .title("Title1")
+                .folder(Folder.valueOf(folder))
+                .isDeleted(false)
+                .build();
+
+        Note note2 = Note.builder()
+                .title("Title2")
+                .folder(Folder.valueOf(folder))
+                .isDeleted(true)
+                .build();
+        List<Note> allNotes = Arrays.asList(note1, note2);
+        when(noteTakingService.getAllNotesByFolder(Folder.valueOf(folder), title)).thenReturn(allNotes);
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/byFolder/" + folder).param("title", title))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
+
     @Test
     public void searchNotesByTitleTest() throws Exception {
         String title = "Test Note";

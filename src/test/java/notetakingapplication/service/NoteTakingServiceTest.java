@@ -21,9 +21,8 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -154,28 +153,64 @@ public class NoteTakingServiceTest {
 
     @Test
     public void testGetAllFavoriteNotes() {
-        Note note1 = new Note();
+        Note note1 = Note.builder()
+                .isFavourite(true)
+                .isDeleted(false)
+                .title("Title1")
+                .updatedAt(LocalDateTime.now())
+                .build();
 
-        Note note2 = new Note();
+        Note note2 = Note.builder()
+                .isFavourite(false)
+                .isDeleted(false)
+                .title("Title2")
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
 
         List<Note> allNotes = Arrays.asList(note1, note2);
+
         when(noteTakingRepository.findAll()).thenReturn(allNotes);
 
-        List<Note> result = noteTakingService.getAllFavoriteNotes();
+        List<Note> result = noteTakingService.getAllFavoriteNotes("Title1");
 
-        assertEquals(0, result.size());
+        assertEquals(1, result.size());
+
+        assertTrue(result.get(0).getTitle().toLowerCase().contains("title1".toLowerCase()));
     }
+
 
     @Test
     public void testGetAllDeletedNotesSortedByUpdatedDate() {
-        Note note = new Note();
-        when(noteTakingRepository.findAllByIsDeletedTrueOrderByUpdatedAtDesc()).thenReturn(Collections.singletonList(note));
+        Note note1 = Note.builder()
+                .isDeleted(true)
+                .title("Title1")
+                .updatedAt(LocalDateTime.now())
+                .build();
 
-        List<Note> notes = noteTakingService.getAllDeletedNotesSortedByUpdatedDate();
+        Note note2 = Note.builder()
+                .isDeleted(true)
+                .title("Title2")
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
 
-        assertFalse(notes.isEmpty());
-        verify(noteTakingRepository, times(1)).findAllByIsDeletedTrueOrderByUpdatedAtDesc();
+        Note note3 = Note.builder()
+                .isDeleted(false)
+                .title("Title3")
+                .updatedAt(LocalDateTime.now().minusDays(2))
+                .build();
+
+        List<Note> allNotes = Arrays.asList(note1, note2, note3);
+
+        when(noteTakingRepository.findAll()).thenReturn(allNotes);
+
+        List<Note> result = noteTakingService.getAllDeletedNotesSortedByUpdatedDate("Title1");
+
+        assertEquals(1, result.size());
+
+        assertTrue(result.get(0).getTitle().toLowerCase().contains("title1".toLowerCase()));
+        assertTrue(result.get(0).isDeleted());
     }
+
 
     @Test
     public void testGetAllUnDeletedNotesSortedByUpdatedDate() {
@@ -189,22 +224,34 @@ public class NoteTakingServiceTest {
     }
 
     @Test
-    public void getAllNotesByFolderTest() {
-        Note note1 = new Note();
-        Note note2 = new Note();
-        Note note3 = new Note();
-        List<Note> allNotes = Arrays.asList(note1, note2, note3);
+    public void testGetAllNotesByFolder() {
+        Folder folder = Folder.Personal;
 
-        given(noteTakingRepository.findAll()).willReturn(allNotes);
-        List<Note> result = noteTakingService.getAllNotesByFolder(Folder.Personal);
+        Note note1 = Note.builder()
+                .title("Title1")
+                .folder(folder)
+                .isDeleted(false)
+                .build();
 
-        List<Note> expected = allNotes.stream()
-                .filter(note -> note.getFolder() == Folder.Personal && !note.isDeleted())
-                .collect(Collectors.toList());
-        assertEquals(expected, result);
+        Note note2 = Note.builder()
+                .title("Title2")
+                .folder(folder)
+                .isDeleted(true)
+                .build();
 
-        then(noteTakingRepository).should(times(1)).findAll();
+        List<Note> allNotes = Arrays.asList(note1, note2);
+
+        when(noteTakingRepository.findAll()).thenReturn(allNotes);
+
+        List<Note> result = noteTakingService.getAllNotesByFolder(folder, "Title1");
+
+        assertEquals(1, result.size());
+
+        assertTrue(result.get(0).getTitle().toLowerCase().contains("title1".toLowerCase()));
+        assertEquals(folder, result.get(0).getFolder());
+        assertFalse(result.get(0).isDeleted());
     }
+
 
     @Test
     public void testSearchNotesByTitle() {
