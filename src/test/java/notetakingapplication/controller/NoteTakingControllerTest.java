@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -104,11 +107,46 @@ public class NoteTakingControllerTest {
     }
 
     @Test
+    public void getAllUndeletedNotesTest() throws Exception {
+
+
+        Note note1 = Note.builder().id(1L).content("Test Note 1").build();
+        Note note2 = Note.builder().id(2L).content("Test Note 2").build();
+
+
+        List<Note> expectedNotes = Arrays.asList(note1, note2);
+
+        when(noteTakingService.getAllUndeletedNotesSortedByUpdatedDate()).thenReturn(expectedNotes);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/undeleted"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+    }
+
+
+    @Test
     public void testGetAllNotesByFolder() throws Exception {
         String folder = Folder.Personal.name();
         mockMvc.perform(MockMvcRequestBuilders.get("/notes/byFolder/" + folder))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
+    @Test
+    public void searchNotesByTitleTest() throws Exception {
+        String title = "Test Note";
+        Note note1 = Note.builder().id(1L).title("Test Note 1").build();
+        Note note2 = Note.builder().id(2L).title("Test Note 2").build();
+
+        List<Note> expectedNotes = Arrays.asList(note1, note2);
+
+        when(noteTakingService.searchNotesByTitle(title)).thenReturn(expectedNotes);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes/search")
+                        .param("title", title))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
 
 }
