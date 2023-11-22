@@ -75,11 +75,12 @@ public class NoteTakingService {
         return note;
     }
 
-    public List<Note> getAllFavoriteNotes() {
+    public List<Note> getAllFavoriteNotes(String title) {
         List<Note> allNotes = this.noteTakingRepository.findAll();
         List<Note> favoriteNotes = allNotes.stream()
                 .filter(Note::isFavourite)
                 .filter(note -> !note.isDeleted())
+                .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()))
                 .sorted(Comparator.comparing(Note::getUpdatedAt).reversed())
                 .collect(Collectors.toList());
         return favoriteNotes;
@@ -102,8 +103,14 @@ public class NoteTakingService {
         return noteId;
     }
 
-    public List<Note> getAllDeletedNotesSortedByUpdatedDate() {
-        return noteTakingRepository.findAllByIsDeletedTrueOrderByUpdatedAtDesc();
+    public List<Note> getAllDeletedNotesSortedByUpdatedDate(String title) {
+        List<Note> allNotes = this.noteTakingRepository.findAll();
+        List<Note> getAllDeletedNotes = allNotes.stream()
+                .filter(note -> note.isDeleted())
+                .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .sorted(Comparator.comparing(Note::getUpdatedAt).reversed())
+                .collect(Collectors.toList());
+        return getAllDeletedNotes;
     }
 
     public List<Note> getAllUndeletedNotesSortedByUpdatedDate() {
@@ -111,9 +118,10 @@ public class NoteTakingService {
     }
 
 
-    public List<Note> getAllNotesByFolder(Folder folder) {
+    public List<Note> getAllNotesByFolder(Folder folder, String title) {
         List<Note> allNotes = this.noteTakingRepository.findAll();
         List<Note> notesByFolder = allNotes.stream()
+                .filter(note -> note.getTitle().toLowerCase().contains(title.toLowerCase()))
                 .filter(note -> note.getFolder() == folder && !note.isDeleted())
                 .collect(Collectors.toList());
         return notesByFolder;

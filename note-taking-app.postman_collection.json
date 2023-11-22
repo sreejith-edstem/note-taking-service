@@ -37,7 +37,17 @@
 			"name": "Update note",
 			"request": {
 				"method": "PUT",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\" : \"Booster\",\r\n    \"content\" : \"Booster is a pollution\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/notes/4"
 			},
 			"response": []
 		},
@@ -65,7 +75,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/notes/favorites",
+					"raw": "http://localhost:8080/notes/favorites?title=",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -77,8 +87,12 @@
 					],
 					"query": [
 						{
-							"key": "keyword",
-							"value": "Boogie",
+							"key": "title",
+							"value": ""
+						},
+						{
+							"key": "",
+							"value": null,
 							"disabled": true
 						}
 					]
@@ -91,7 +105,7 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"url": "http://localhost:8080/notes/toggleSoftDelete/6"
+				"url": "http://localhost:8080/notes/toggleSoftDelete/4"
 			},
 			"response": []
 		},
@@ -99,7 +113,25 @@
 			"name": "Get deleted notes",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/notes/deleted?title=s",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"notes",
+						"deleted"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "s"
+						}
+					]
+				}
 			},
 			"response": []
 		},
@@ -117,7 +149,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8080/notes"
+				"url": "http://localhost:8080/notes/5"
 			},
 			"response": []
 		},
@@ -126,7 +158,25 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8080/notes/favoriteNotesByFolder"
+				"url": {
+					"raw": "http://localhost:8080/notes/byFolder/Work?title=",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"notes",
+						"byFolder",
+						"Work"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": ""
+						}
+					]
+				}
 			},
 			"response": []
 		},
@@ -134,7 +184,25 @@
 			"name": "Search a note",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/notes/search?title=third title",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"notes",
+						"search"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "third title"
+						}
+					]
+				}
 			},
 			"response": []
 		}

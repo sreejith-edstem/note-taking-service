@@ -61,8 +61,8 @@ public class NoteTakingController {
     }
 
     @GetMapping("/favorites")
-    public @ResponseBody List<Note> getAllFavoriteNotes() {
-        return noteTakingService.getAllFavoriteNotes();
+    public @ResponseBody List<Note> getAllFavoriteNotes(@RequestParam String title) {
+        return noteTakingService.getAllFavoriteNotes(title);
     }
 
     @DeleteMapping("/toggleSoftDelete/{noteId}")
@@ -72,8 +72,8 @@ public class NoteTakingController {
     }
 
     @GetMapping("/deleted")
-    public @ResponseBody List<Note> getAllDeletedNotes() {
-        return noteTakingService.getAllDeletedNotesSortedByUpdatedDate();
+    public @ResponseBody List<Note> getAllDeletedNotes(@RequestParam String title) {
+        return noteTakingService.getAllDeletedNotesSortedByUpdatedDate(title);
     }
 
     @GetMapping("/undeleted")
@@ -82,8 +82,8 @@ public class NoteTakingController {
     }
 
     @GetMapping("/byFolder/{folder}")
-    public @ResponseBody List<Note> getAllNotesByFolder(@PathVariable Folder folder) {
-        return noteTakingService.getAllNotesByFolder(folder);
+    public @ResponseBody List<Note> getAllNotesByFolder(@PathVariable Folder folder, @RequestParam String title) {
+        return noteTakingService.getAllNotesByFolder(folder,title);
     }
 
     @GetMapping("/search")
